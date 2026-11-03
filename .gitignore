@@ -1,4 +1,9 @@
 
+# Local environment; publish the example only
+/.env
+/.env.*
+!/.env.example
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -18,3 +23,41 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+
+
+/frontend/node_modules/
+/frontend/dist/
+/public/app/
+/test-results/
+/playwright-report/
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+/frontend/test-results/
+/frontend/playwright-report/
+/frontend/*.tsbuildinfo
+
+# Local workspace configuration and resources
+/.agents/
+/.codex/
+/.claude/
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+/docs/skills.md
+/docs/skills/
+/scripts/install-skills.sh
+/design-system/
+
+# Local reports, exports and temporary files
+/docs/verification.md
+/coverage/
+/frontend/coverage/
+/backups/
+/tmp/
+*.log
+.DS_Store
+/docs/

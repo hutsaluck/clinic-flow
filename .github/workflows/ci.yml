@@ -1,0 +1,54 @@
+name: ClinicFlow CI
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: {POSTGRES_DB: clinicflow, POSTGRES_USER: clinicflow, POSTGRES_PASSWORD: clinicflow_dev}
+        ports: ['54329:5432']
+        options: --health-cmd "pg_isready -U clinicflow" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://clinicflow:clinicflow_dev@127.0.0.1:54329/clinicflow?serverVersion=16&charset=utf8
+      MAILER_DSN: null://null
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.3', extensions: 'pdo_pgsql, intl', coverage: none}
+      - run: composer install --no-interaction --prefer-dist --no-scripts
+      - run: composer validate --strict
+      - run: php bin/console lint:container
+      - run: php bin/console lint:yaml config
+      - run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+      - run: vendor/bin/phpstan analyse -c phpstan-domain.neon --no-progress
+      - run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      - run: scripts/test.sh
+  frontend-e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: {POSTGRES_DB: clinicflow, POSTGRES_USER: clinicflow, POSTGRES_PASSWORD: clinicflow_dev}
+        ports: ['54329:5432']
+        options: --health-cmd "pg_isready -U clinicflow" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      MAILER_DSN: null://null
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.3', extensions: 'pdo_pgsql, intl', coverage: none}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm, cache-dependency-path: frontend/package-lock.json}
+      - run: composer install --no-interaction --no-scripts
+      - run: php bin/console doctrine:migrations:migrate --no-interaction && php bin/console app:demo:seed
+      - run: npm ci && npm run lint && npm run build && npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: php -S 127.0.0.1:8080 -t public public/router.php > var/server.log 2>&1 &
+      - run: npm run test:e2e
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: {name: browser-traces, path: frontend/test-results}

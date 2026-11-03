@@ -1,0 +1,13 @@
+parameters:
+    level: 9
+    paths:
+        - src/Shared/Domain
+        - src/Shared/Application
+        - src/Appointment/Application
+        - src/Appointment/Bookings.php
+        - src/Billing/Application
+        - src/Billing/Billing.php
+        - src/Appointment/Domain
+        - src/Billing/Domain
+        - src/Scheduling/Domain
+    tmpDir: var/phpstan-domain

@@ -1,25 +1,57 @@
-
 services:
-###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_DB: clinicflow
+      POSTGRES_USER: clinicflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinicflow_dev}
+    ports: ['127.0.0.1:54329:5432']
+    volumes: [database_data:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
-
+      test: ['CMD-SHELL', 'pg_isready -U clinicflow -d clinicflow']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  mailer:
+    image: axllent/mailpit:v1.27
+    ports: ['127.0.0.1:8025:8025', '127.0.0.1:1025:1025']
+  app:
+    build: .
+    image: clinicflow:local
+    environment: &app_env
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: ${APP_SECRET:-local-demo-change-before-deployment}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      DATABASE_URL: postgresql://clinicflow:${POSTGRES_PASSWORD:-clinicflow_dev}@database:5432/clinicflow?serverVersion=16&charset=utf8
+      MESSENGER_TRANSPORT_DSN: redis://redis:6379/messages
+      MAILER_DSN: smtp://mailer:1025
+    depends_on:
+      database: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  web:
+    image: nginx:1.27-alpine
+    ports: ['127.0.0.1:8080:80']
+    volumes: ['./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro']
+    depends_on: [app]
+  worker:
+    image: clinicflow:local
+    environment: *app_env
+    command: ['php', 'bin/console', 'messenger:consume', 'async', '--time-limit=3600', '--memory-limit=128M']
+    restart: unless-stopped
+    depends_on: [app]
+  scheduler:
+    image: clinicflow:local
+    environment: *app_env
+    command: ['sh', '-c', 'while true; do php bin/console app:notifications:tick; sleep 60; done']
+    restart: unless-stopped
+    depends_on: [app]
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
