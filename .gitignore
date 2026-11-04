@@ -41,6 +41,7 @@
 /frontend/*.tsbuildinfo
 
 # Local workspace configuration and resources
+/.idea/
 /.agents/
 /.codex/
 /.claude/
