@@ -95,10 +95,6 @@ npm run test:e2e
 - Access token зберігається в пам’яті React; refresh — у HttpOnly SameSite cookie (Secure на HTTPS). У БД зберігаються лише хеші токенів. Повторне використання refresh відкликає всю сім’ю сесії.
 - Outbox атомарний із прийомом, delivery дедуплікується; перед SMTP повторно перевіряється версія прийому. SMTP не забезпечує exactly-once delivery: збій після прийняття листа провайдером, але до commit може спричинити повтор. Використано стабільний Message-ID.
 
-## Документація та експлуатація
+## Документація
 
-Повне розгортання на VPS Ukraine.com.ua через GitHub Actions: [DEPLOYMENT.md](DEPLOYMENT.md). Production stack винесено в `compose.production.yaml`; його запуск не потребує локальних `.env` або demo seed.
-
-[Технічне завдання](docs/ClinicFlow_TZ.md) · [Архітектура](docs/architecture/overview.md) · [ADR](docs/adr/decisions.md) · [Експлуатація](docs/operations.md) · [OpenAPI JSON](docs/api/openapi.json) · [Стан вимог](docs/requirements.md).
-
-Перед staging задайте власні `APP_SECRET`, `POSTGRES_PASSWORD`, `APP_URL`, SMTP і HTTPS reverse proxy. Не використовуйте демооблікові записи в робочому середовищі. Публічний staging, домен, зовнішній SMTP та моніторинг потребують окремої інфраструктури; цей репозиторій містить застосунок і процедуру розгортання.
+[Технічне завдання](docs/ClinicFlow_TZ.md) · [Архітектура](docs/architecture/overview.md) · [ADR](docs/adr/decisions.md) · [OpenAPI JSON](docs/api/openapi.json) · [Стан вимог](docs/requirements.md).
