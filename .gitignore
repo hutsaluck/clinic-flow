@@ -60,4 +60,24 @@ CLAUDE.md
 /tmp/
 *.log
 .DS_Store
-/docs/
+/docs/*
+!/docs/api/
+/docs/api/*
+!/docs/api/openapi.json
+/deploy/.env*
+!/deploy/*.env.example
+
+# Local deployment materials and private credentials
+/DEPLOYMENT.md
+/compose.production.yaml
+/deploy/
+/.github/workflows/deploy.yml
+/docker/Caddyfile
+/docker/nginx.production.conf
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+credentials.json
