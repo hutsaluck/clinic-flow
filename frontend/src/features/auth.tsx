@@ -10,11 +10,12 @@ import {
 import { api, setToken } from "../api";
 import { err } from "../shared/ui";
 import { BrandMark } from "../shared/brand";
+import { demoMode } from "../shared/environment";
 
 export function Login({ onLogin }: { onLogin: () => Promise<void> }) {
     const reset = new URLSearchParams(location.search).get("reset_token");
     const [mode, setMode] = useState(reset ? "reset" : "login"),
-        [email, setEmail] = useState("admin@clinicflow.test"),
+        [email, setEmail] = useState(demoMode ? "admin@clinicflow.test" : ""),
         [password, setPassword] = useState(""),
         [error, setError] = useState(""),
         [busy, setBusy] = useState(false),
@@ -182,23 +183,29 @@ export function Login({ onLogin }: { onLogin: () => Promise<void> }) {
                             ? "Забули пароль?"
                             : "Повернутися до входу"}
                     </button>
-                    <details className="demo-login">
-                        <summary>
-                            <ShieldCheck size={16} aria-hidden="true" />
-                            Демооблікові записи
-                        </summary>
-                        <p>
-                            admin / reception / doctor / platform
-                            @clinicflow.test
-                            <br />
-                            Пароль: <code>ClinicFlow!2026</code>
-                        </p>
-                    </details>
+                    {demoMode && (
+                        <details className="demo-login">
+                            <summary>
+                                <ShieldCheck size={16} aria-hidden="true" />
+                                Демооблікові записи
+                            </summary>
+                            <p>
+                                admin / reception / doctor / platform
+                                @clinicflow.test
+                                <br />
+                                Пароль: <code>ClinicFlow!2026</code>
+                            </p>
+                        </details>
+                    )}
                 </section>
             </main>
             <footer className="login-footer">
                 <span>ClinicFlow. Створено для щоденної практики.</span>
-                <span>Демонстраційний простір · синтетичні дані</span>
+                <span>
+                    {demoMode
+                        ? "Демонстраційний простір · синтетичні дані"
+                        : "Простір для вашої клініки"}
+                </span>
             </footer>
         </div>
     );

@@ -38,8 +38,9 @@ final class UserCommand extends Command
         }
         $question = (new Question('Password (12+ characters): '))->setHidden(true);
         $password = (new \Symfony\Component\Console\Helper\QuestionHelper())->ask($input, $output, $question);
-        $this->s->db->insert('users', ['id' => Id::new(), 'email' => $email, 'first_name' => $input->getArgument('first-name'), 'last_name' => $input->getArgument('last-name'), 'password_hash' => $this->identity->hash($password), 'platform_admin' => $input->getOption('platform-admin') ? 1 : 0]);
-        $output->writeln('Account created.');
+        $id = Id::new();
+        $this->s->db->insert('users', ['id' => $id, 'email' => $email, 'first_name' => $input->getArgument('first-name'), 'last_name' => $input->getArgument('last-name'), 'password_hash' => $this->identity->hash($password), 'platform_admin' => $input->getOption('platform-admin') ? 1 : 0]);
+        $output->writeln('Account created. User ID: '.$id);
 
         return Command::SUCCESS;
     }

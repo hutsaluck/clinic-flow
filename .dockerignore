@@ -30,3 +30,9 @@ backups
 tmp
 *.log
 .DS_Store
+deploy/.env*
+!deploy/*.env.example
+docs/*
+!docs/api/
+docs/api/*
+!docs/api/openapi.json

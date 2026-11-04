@@ -1,5 +1,12 @@
 name: ClinicFlow CI
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore: [master]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
 jobs:
   backend:
     runs-on: ubuntu-latest

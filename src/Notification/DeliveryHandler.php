@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notification;
 
 use App\Shared\Store;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Mime\Email;
@@ -12,7 +13,7 @@ use Symfony\Component\Mime\Email;
 #[AsMessageHandler]
 final class DeliveryHandler
 {
-    public function __construct(private Store $s, private MailerInterface $mailer)
+    public function __construct(private Store $s, private MailerInterface $mailer, #[Autowire('%env(MAILER_FROM)%')] private string $sender)
     {
     }
 
@@ -35,8 +36,10 @@ final class DeliveryHandler
                 'REMINDER' => 'Нагадування про прийом', 'appointment.CANCEL' => 'Прийом скасовано', 'appointment.reschedule','appointment.RESCHEDULE' => 'Прийом перенесено', default => 'Ваш запис у ClinicFlow',
             };
             // Direct SMTP here; enqueue the delivery ID only, never an entire patient email payload.
-            $email = (new Email())->from('noreply@clinicflow.test')->to($n['recipient'])->subject($subject)->text($subject.'. Час: '.$when.'. Послуга: '.$a['service_name_snapshot'].'.');
-            $email->getHeaders()->addIdHeader('Message-ID', $n['id'].'@clinicflow.test');
+            $email = (new Email())->from($this->sender)->to($n['recipient'])->subject($subject)->text($subject.'. Час: '.$when.'. Послуга: '.$a['service_name_snapshot'].'.');
+            $senderAddress = $email->getFrom()[0]->getEncodedAddress();
+            $messageDomain = substr($senderAddress, (int) strrpos($senderAddress, '@') + 1);
+            $email->getHeaders()->addIdHeader('Message-ID', $n['id'].'@'.$messageDomain);
             $this->mailer->send($email);
             $this->s->db->update('notification_deliveries', ['status' => 'SENT', 'sent_at' => gmdate('c'), 'attempts' => (int) $n['attempts'] + 1, 'last_error_code' => null], ['id' => $n['id']]);
         });

@@ -8,6 +8,7 @@ use App\Identity\Identity;
 use App\Shared\ApiError;
 use App\Shared\Input;
 use App\Shared\Store;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/v1')]
 final class AuthController
 {
-    public function __construct(private Identity $identity, private Store $s, private MailerInterface $mailer)
+    public function __construct(private Identity $identity, private Store $s, private MailerInterface $mailer, #[Autowire('%env(MAILER_FROM)%')] private string $sender)
     {
     }
 
@@ -98,7 +99,7 @@ final class AuthController
             $token = bin2hex(random_bytes(32));
             $this->s->db->insert('password_reset_tokens', ['token_hash' => hash('sha256', $token), 'user_id' => $u['id'], 'expires_at' => (new \DateTimeImmutable('+30 minutes'))->format('c')]);
             $url = rtrim($_ENV['APP_URL'] ?? 'http://localhost:8080', '/').'/?reset_token='.$token;
-            $this->mailer->send((new Email())->from('noreply@clinicflow.test')->to($email)->subject('ClinicFlow — відновлення пароля')->text('Встановіть новий пароль (посилання діє 30 хвилин): '.$url));
+            $this->mailer->send((new Email())->from($this->sender)->to($email)->subject('ClinicFlow — відновлення пароля')->text('Встановіть новий пароль (посилання діє 30 хвилин): '.$url));
         }
 
         return new JsonResponse(['data' => ['message' => 'Якщо обліковий запис існує, ми надіслали лист.']]);

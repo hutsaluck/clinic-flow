@@ -16,6 +16,7 @@ import {
 import { api, refresh, setToken } from "./api";
 import { roleNames, Empty, Modal } from "./shared/ui";
 import { BrandMark } from "./shared/brand";
+import { demoMode } from "./shared/environment";
 import { useTheme, useUrlValue } from "./app/navigation";
 import type { SessionUser, Clinic, SessionResponse } from "./app/types";
 import { Login } from "./features/auth";
@@ -315,7 +316,7 @@ export function App() {
                     <span className="nav-spacer" />
                     <span className="environment-mark">
                         <i />
-                        Демопростір
+                        {demoMode ? "Демопростір" : "Робочий простір"}
                     </span>
                 </nav>
             </header>
@@ -400,7 +401,7 @@ export function App() {
             <footer className="app-footer">
                 <span>Робочий простір для вашої клініки.</span>
                 <span>
-                    Синтетичні демодані <i />
+                    {demoMode ? "Синтетичні демодані" : "ClinicFlow"} <i />
                     {clinic?.timezone || "UTC"}
                     <a href="/api/docs" target="_blank" rel="noreferrer">
                         Документація

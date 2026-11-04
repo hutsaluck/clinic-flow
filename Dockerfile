@@ -1,4 +1,6 @@
 FROM node:22-alpine AS frontend
+ARG VITE_DEMO_MODE=true
+ENV VITE_DEMO_MODE=$VITE_DEMO_MODE
 WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm ci
@@ -7,7 +9,7 @@ RUN npm run build
 
 FROM php:8.3-fpm-alpine
 RUN apk add --no-cache icu-dev libpq-dev libzip-dev linux-headers $PHPIZE_DEPS \
-    && docker-php-ext-install pdo_pgsql intl opcache zip \
+    && docker-php-ext-install pdo_pgsql intl opcache zip pcntl \
     && pecl install redis && docker-php-ext-enable redis
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app

@@ -1,4 +1,5 @@
-parameters: {}
+parameters:
+    env(MAILER_FROM): 'noreply@clinicflow.test'
 services:
     _defaults:
         autowire: true

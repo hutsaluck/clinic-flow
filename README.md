@@ -97,6 +97,8 @@ npm run test:e2e
 
 ## Документація та експлуатація
 
+Повне розгортання на VPS Ukraine.com.ua через GitHub Actions: [DEPLOYMENT.md](DEPLOYMENT.md). Production stack винесено в `compose.production.yaml`; його запуск не потребує локальних `.env` або demo seed.
+
 [Технічне завдання](docs/ClinicFlow_TZ.md) · [Архітектура](docs/architecture/overview.md) · [ADR](docs/adr/decisions.md) · [Експлуатація](docs/operations.md) · [OpenAPI JSON](docs/api/openapi.json) · [Стан вимог](docs/requirements.md).
 
 Перед staging задайте власні `APP_SECRET`, `POSTGRES_PASSWORD`, `APP_URL`, SMTP і HTTPS reverse proxy. Не використовуйте демооблікові записи в робочому середовищі. Публічний staging, домен, зовнішній SMTP та моніторинг потребують окремої інфраструктури; цей репозиторій містить застосунок і процедуру розгортання.

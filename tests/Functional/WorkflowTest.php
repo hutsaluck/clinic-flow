@@ -247,7 +247,7 @@ final class WorkflowTest extends WebTestCase
         $tester->execute([]);
         self::assertSame(1, (int) $this->s->db->fetchOne("SELECT count(*) FROM notification_deliveries WHERE appointment_id=? AND template_key='appointment.CREATED'", [$a['id']]));
         $id = $this->s->db->fetchOne("SELECT id FROM notification_deliveries WHERE appointment_id=? AND template_key='appointment.CREATED'", [$a['id']]);
-        $handler = new \App\Notification\DeliveryHandler($this->s, new \Symfony\Component\Mailer\Mailer(new \Symfony\Component\Mailer\Transport\NullTransport()));
+        $handler = new \App\Notification\DeliveryHandler($this->s, new \Symfony\Component\Mailer\Mailer(new \Symfony\Component\Mailer\Transport\NullTransport()), 'notifications@example.test');
         $handler(new \App\Notification\Delivery($id));
         $handler(new \App\Notification\Delivery($id));
         self::assertSame(1, (int) $this->s->db->fetchOne('SELECT attempts FROM notification_deliveries WHERE id=?', [$id]));
