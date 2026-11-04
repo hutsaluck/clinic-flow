@@ -60,7 +60,6 @@ CLAUDE.md
 /tmp/
 *.log
 .DS_Store
-/docs/*
 !/docs/api/
 /docs/api/*
 !/docs/api/openapi.json

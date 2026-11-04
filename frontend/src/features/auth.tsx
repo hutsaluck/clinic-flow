@@ -16,7 +16,9 @@ export function Login({ onLogin }: { onLogin: () => Promise<void> }) {
     const reset = new URLSearchParams(location.search).get("reset_token");
     const [mode, setMode] = useState(reset ? "reset" : "login"),
         [email, setEmail] = useState(demoMode ? "admin@clinicflow.test" : ""),
-        [password, setPassword] = useState(""),
+        [password, setPassword] = useState(
+            demoMode && !reset ? "ClinicFlow!2026" : "",
+        ),
         [error, setError] = useState(""),
         [busy, setBusy] = useState(false),
         [message, setMessage] = useState("");
